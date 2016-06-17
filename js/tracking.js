@@ -170,11 +170,11 @@
    * @return {tracking.TrackerTask}
    * @private
    */
-  tracking.trackCanvas_ = function(element, tracker) {
+  tracking.trackCanvas_ = function(element, tracker,options) {
     var self = this;
     var task = new tracking.TrackerTask(tracker);
     task.on('run', function() {
-      self.trackCanvasInternal_(element, tracker);
+      self.trackCanvasInternal_(element, tracker,options);
     });
     return task.run();
   };
@@ -189,12 +189,25 @@
    * @param {object} opt_options Optional configuration to the tracker.
    * @private
    */
-  tracking.trackCanvasInternal_ = function(element, tracker) {
+  tracking.trackCanvasInternal_ = function(element, tracker,options) {
     var width = element.width;
     var height = element.height;
-    var context = element.getContext('2d');
-    var imageData = context.getImageData(0, 0, width, height);
-    tracker.track(imageData.data, width, height);
+    var context = options["context"] || element.getContext('2d');
+    console.log("veamos "+options["context"]);
+    if(options["context"]){
+      console.log("paso");
+      var requestAnimationFrame_ = function() {
+        requestId = window.requestAnimationFrame(function() {           
+          var imageData = context.getImageData(0, 0, width, height);
+          tracker.track(imageData.data, width, height); 
+          requestAnimationFrame_();
+        });
+      };
+      requestAnimationFrame_();
+    }else{
+      var imageData = context.getImageData(0, 0, width, height);
+      tracker.track(imageData.data, width, height);
+    }
   };
 
   /**
