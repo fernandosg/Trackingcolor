@@ -13,7 +13,8 @@
 </head>
 <body>
 	<canvas id="canvas" width="640" height="480"></canvas>
-  <script src="../js/webcam.js"></script>
+  <script src="./js/webcam.js"></script>
+  <script type="text/javascript" js="./js/app.js"></script>
   <script src="../js/tracking.js"></script>
   <script type="text/javascript">  	
     function loop(){
@@ -25,7 +26,13 @@
       canvas = document.getElementById('canvas');
       video=new THREEx.WebcamTexture(canvas.width,canvas.height);
       context = canvas.getContext('2d');
-      var tracker = new tracking.ColorTracker(['magenta', 'cyan', 'yellow']);
+      tracking.ColorTracker.registerColor('green', function(r, g, b) {
+        if (g>200) {
+          return true;
+        }
+        return false;
+      });
+      var tracker = new tracking.ColorTracker(["green"]);
       tracking.track(canvas, tracker, { camera: true,context:context });
       tracker.on('track', function(event) {
         //context.clearRect(0, 0, canvas.width, canvas.height);
