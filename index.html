@@ -14,7 +14,7 @@
 <body>
 	<canvas id="canvas" width="640" height="480"></canvas>
   <script src="./js/webcam.js"></script>
-  <script type="text/javascript" js="./js/app.js"></script>
+  <script type="text/javascript" src="./js/app.js"></script>
   <script src="../js/tracking.js"></script>
   <script type="text/javascript">  	
     function loop(){
@@ -27,7 +27,9 @@
       video=new THREEx.WebcamTexture(canvas.width,canvas.height);
       context = canvas.getContext('2d');
       tracking.ColorTracker.registerColor('green', function(r, g, b) {
-        if (g>200) {
+        colors=RGBtoHSV(r,g,b);           
+        //Range of color green
+        if ((colors["h"]<=140 && colors["h"]>=96) && (colors["s"]<=.97 && colors["s"]>=.40) &&(colors["v"]<=1 && colors["v"]>=.52)) {
           return true;
         }
         return false;
@@ -35,7 +37,6 @@
       var tracker = new tracking.ColorTracker(["green"]);
       tracking.track(canvas, tracker, { camera: true,context:context });
       tracker.on('track', function(event) {
-        //context.clearRect(0, 0, canvas.width, canvas.height);
         event.data.forEach(function(rect) {
           if (rect.color === 'custom') {
             rect.color = tracker.customColor;
