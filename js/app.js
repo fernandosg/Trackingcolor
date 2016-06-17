@@ -25,6 +25,7 @@ function initThreeJS(){
 	threediv.width=640;
 	threediv.height=480;
 	renderer=new THREE.WebGLRenderer();
+  	renderer.autoClear = false;
   	renderer.setSize(640,480); 
 	camera=new THREE.PerspectiveCamera(45,threediv.width/threediv.height,.1,2000),videoCamera=new THREE.Camera();
 	document.getElementById("three").appendChild(renderer.domElement);
@@ -58,9 +59,9 @@ function initThreeJS(){
 
 function rendering(){
 	renderer.clear()
-	renderer.render(scene,camera);
-	renderer.clearDepth();
 	renderer.render(videoScene,videoCamera);
+	renderer.clearDepth();
+	renderer.render(scene,camera);
 	renderer.clearDepth();
 }
 
@@ -89,6 +90,9 @@ function trackingInit(){
           if (rect.color === 'custom') {
             rect.color = tracker.customColor;
           }
+          mesh.position.x=rect.x;
+          mesh.position.y=rect.y;
+          mesh.visible=true;
           console.log("Detect something "+rect.x+" "+rect.y);
           context.strokeStyle = rect.color;
           context.strokeRect(rect.x, rect.y, rect.width, rect.height);
