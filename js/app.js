@@ -74,11 +74,22 @@ function loop(){
 	rendering();
 	requestAnimationFrame(loop);
 }
+var count=10,countingColors=false;
+codesColors=[];
+function registerColor(){
+	countingColors=countingColors ? false : true;
+}
+
+function checkColors(){
+	codesColors.forEach(function(elem){
+		console.dir(elem);
+	})
+}
 function trackingInit(){
       tracking.ColorTracker.registerColor('green', function(r, g, b) {
         colors=RGBtoHSV(r,g,b);           
         //Range of color green
-        if ((colors["h"]<=140 && colors["h"]>=96) && (colors["s"]<=.97 && colors["s"]>=.40) &&(colors["v"]<=1 && colors["v"]>=.52)) {
+        if ((colors["h"]<=140 && colors["h"]>=78) && (colors["s"]<=.97 && colors["s"]>=.40) &&(colors["v"]<=1 && colors["v"]>=.30)) {        
           return true;
         }
         return false;
@@ -86,20 +97,20 @@ function trackingInit(){
       var tracker = new tracking.ColorTracker(["green"]);
       tracking.track(canvas, tracker, { camera: true,context:context });
       tracker.on('track', function(event) {
+      	//Data attribute have the two colors detected
         event.data.forEach(function(rect) {
           if (rect.color === 'custom') {
             rect.color = tracker.customColor;
           }
-          mesh.position.x=rect.x;
-          mesh.position.y=rect.y;
+          //Call the registerColors and then checkColors for all the colors detected
+          if(countingColors){
+          	codesColors.push(event);
+          	if(codesColors.length==10)
+          		registerColor();
+          }
+          mesh.position.x=rect.x- (canvas.width / 2);
+          mesh.position.y=(canvas.height / 2) - rect.y;
           mesh.visible=true;
-          console.log("Detect something "+rect.x+" "+rect.y);
-          context.strokeStyle = rect.color;
-          context.strokeRect(rect.x, rect.y, rect.width, rect.height);
-          context.font = '11px Helvetica';
-          context.fillStyle = "#fff";
-          context.fillText('x: ' + rect.x + 'px', rect.x + rect.width + 5, rect.y + 11);
-          context.fillText('y: ' + rect.y + 'px', rect.x + rect.width + 5, rect.y + 22);
         });
       });
 }
