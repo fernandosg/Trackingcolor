@@ -65,8 +65,6 @@ function rendering(){
 	renderer.clearDepth();
 }
 
-//Debo de abrir gimp y sacar el rgb color del recuadro que imprimi, y con el hsv, buscar
-//el rango de colores de verde (LISTO)
 function loop(){
 	context.drawImage(video.video,0,0,canvas.width,canvas.height);
 	canvas.changed=true;
@@ -94,15 +92,14 @@ function trackingInit(){
         }
         return false;
       });
-      var tracker = new tracking.ColorTracker(["green"]);
+      var tracker = new tracking.ColorTracker(["green"]);      
       tracking.track(canvas, tracker, { camera: true,context:context });
       tracker.on('track', function(event) {
       	//Data attribute have the two colors detected
         event.data.forEach(function(rect) {
           if (rect.color === 'custom') {
             rect.color = tracker.customColor;
-          }
-          //Call the registerColors and then checkColors for all the colors detected
+          }          
           if(countingColors){
           	codesColors.push(event);
           	if(codesColors.length==10)

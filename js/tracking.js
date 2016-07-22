@@ -144,7 +144,7 @@
     }
 
     switch (element.nodeName.toLowerCase()) {
-      case 'canvas':
+      case 'canvas':        
         return this.trackCanvas_(element, tracker, opt_options);
       case 'img':
         return this.trackImg_(element, tracker, opt_options);
@@ -174,7 +174,10 @@
     var self = this;
     var task = new tracking.TrackerTask(tracker);
     task.on('run', function() {
-      self.trackCanvasInternal_(element, tracker,options);
+      if(options["context"])
+        self.trackCanvasInteralUpgradeable_(element,tracker,options);
+      else
+        self.trackCanvasInternal_(element, tracker,options);
     });
     return task.run();
   };
@@ -195,7 +198,6 @@
     var context = options["context"] || element.getContext('2d');
     console.log("veamos "+options["context"]);
     if(options["context"]){
-      console.log("paso");
       var requestAnimationFrame_ = function() {
         requestId = window.requestAnimationFrame(function() {           
           var imageData = context.getImageData(0, 0, width, height);
@@ -208,6 +210,33 @@
       var imageData = context.getImageData(0, 0, width, height);
       tracker.track(imageData.data, width, height);
     }
+  };
+
+
+
+  /**
+   * NEW FUNCTION
+   * Tracks a canvas (which it is constantly updated ) element based on the specified `tracker` instance. This
+   * method extract the pixel information of the input element to pass to the
+   * `tracker` instance.
+   * @param {HTMLCanvasElement} element Canvas element to track.
+   * @param {tracking.Tracker} tracker The tracker instance used to track the
+   *     element.
+   * @param {object} opt_options Optional configuration to the tracker.
+   * @private
+   */
+  tracking.trackCanvasInteralUpgradeable_ = function(element, tracker,options) {
+    var width = element.width;
+    var height = element.height;
+    var context = options["context"];
+    var requestAnimationFrame_ = function() {
+      requestId = window.requestAnimationFrame(function() {           
+        var imageData = context.getImageData(0, 0, width, height);
+        tracker.track(imageData.data, width, height); 
+        requestAnimationFrame_();
+      });
+    };
+    requestAnimationFrame_();
   };
 
   /**
